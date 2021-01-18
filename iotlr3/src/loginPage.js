@@ -15,8 +15,9 @@ export default function LoginPage() {
 
     return( 
         <div className='login-div'>
-            <input value={login} onChange={(e)=>{setLogin(e.target.value)}} className='login-input' style={{marginTop:'40px'}} placeholder='Логин'></input>
-            <input value={password} onChange={(e)=>{setPassword(e.target.value)}} className='login-input' placeholder='Пароль'></input>
+            <p className='login-text'>Авторизация</p>
+            <input value={login} onChange={(e)=>{setLogin(e.target.value)}} className='login-input' placeholder='Логин'></input>
+            <input type='password' value={password} onChange={(e)=>{setPassword(e.target.value)}} className='login-input' placeholder='Пароль'></input>
             <button className='login-button' onClick={tryLogin}>Войти</button>
         
             {loggedIn ? (<Redirect push to='/main' />) : null}
