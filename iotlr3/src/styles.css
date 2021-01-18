@@ -1,0 +1,39 @@
+html, body {
+    font-weight: 400;
+    background: rgb(16,20,18);
+    background: linear-gradient(90deg, rgba(16,20,18,1) 0%, rgba(21,47,34,1) 35%, rgba(2,135,162,1) 100%);
+}
+
+.login-div {
+    width: 600px;
+    height: 300px;
+    background-color:white;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 300px;
+    border-radius: 15px;
+    align-content: center;
+}
+
+.login-input {
+    font-size: 36px;
+    height: 40px;
+    width: 480px;
+    margin-left: 40px;
+    margin-right: auto;
+    margin-top: 20px;
+    padding-left: 30px;
+    border-radius: 10px;
+    background-color: ivory;
+}
+
+.login-button {
+    font-size: 36px;
+    height: 80px;
+    width: 200px;
+    border-radius: 10px;
+    margin-top: 35px;
+    margin-left: 200px;
+    background-color: rgb(65, 178, 201);
+    color: white;
+}
