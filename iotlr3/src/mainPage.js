@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import Thermometer from 'react-thermometer-chart';
+import mqtt from 'mqtt';
 
 export default function MainPage() {
+    
+    var client = mqtt.connect('ws://test.mosquitto.org:8080');
+    client.on('message', function (topic, message) {
+        console.log(topic);
+        console.log( message.toString() );
+    });
+    
     /*
     var mqtt    = require('mqtt');
     var options = {
@@ -28,8 +36,8 @@ export default function MainPage() {
     */
 
     const [loggedOut, setLoggedOut] = useState(false);
-    const [temp, setTemp] = useState(-55);
-    const [humidity, setHumidity] = useState(67);
+    const [temp, setTemp] = useState(0);
+    const [humidity, setHumidity] = useState(0);
 
     const [id, setId] = useState('');
     const [maxTemp, setMaxTemp] = useState('');
@@ -42,8 +50,13 @@ export default function MainPage() {
     if (!fetchedData) {
         setFetchedData(true);
 
-        if (localStorage.getItem("id") != null) {
+        if (localStorage.getItem("id") != null && localStorage.getItem("id") !== '') {
             setId(localStorage.getItem("id"));
+            //
+            startLoop();
+            //
+
+            client.subscribe(localStorage.getItem("id"));
         }
         if (localStorage.getItem("minTemp") != null) {
             setMinTemp(localStorage.getItem("minTemp"));
@@ -59,13 +72,47 @@ export default function MainPage() {
         }
     }
 
+    function startLoop() {
+        window.gen = true;
+        genData();
+    }
+
+    function stopLoop() {
+        window.gen = false;
+    }
+
+    function genData() {
+        setTemp( Math.round((Math.random() * (100) - 50) * 10) / 10 );
+        setHumidity( Math.round( (Math.random() * (100)) * 10) / 10 );
+        if (window.gen) {
+            setTimeout( ()=>{genData()}, 1000);
+        }
+    }
+
     return( 
         <div className='main-div'>
+
             <p className='main-header'>Панель Управления</p>
             <input value={id} onChange={(e)=>{setId(e.target.value)}} id='id' className='main-input1' placeholder='Идентификатор'></input>
-            <button onClick={()=>{ localStorage.setItem("id", id);}} className='top-button'>Назначить</button>
+            <button onClick={()=>{
+                if (localStorage.getItem("id") != null && localStorage.getItem("id") !== '') {
+                    client.unsubscribe(localStorage.getItem("id"));
+                }
+                localStorage.setItem("id", id);
+                client.subscribe(id);
+                /**/
+                stopLoop();
+                setTimeout( ()=>{setTemp(0);setHumidity(0);}, 1050);
+                if (id !== '') {
+                    setTimeout( ()=>{startLoop()}, 4000);
+                }
+                
+
+            }} className='top-button'>Назначить</button>
             <button className='top-button' style={{marginLeft:'195px'}} onClick={()=>{setLoggedOut(true);}}>Выйти</button>
+            
             <div className='row'>
+
                 <div className='column'>
                     <p className='row-header-text'>Температура</p>
                     <p className='row-text'>Минимальная пороговая температура</p>
@@ -77,11 +124,11 @@ export default function MainPage() {
                     <p className='display-text'>{temp}°C</p>
                     <div style={{display: 'inline-block', width: '200px', position:'relative', left: '200px', top:'-220px'}}>
                         <Thermometer
-                            width="200px" height="500px" steps={10} minValue={-100} maxValue={100} currentValue={temp+100}> 
+                            width="200px" height="500px" steps={10} minValue={-50} maxValue={50} currentValue={temp+50}> 
                         </Thermometer>
                     </div>
-                    
                 </div>
+
                 <div className='column'>
                     <p className='row-header-text'>Влажность</p>
                     <p id='minHumidity' className='row-text'>Минимальная пороговая влажность</p>
@@ -99,6 +146,7 @@ export default function MainPage() {
                             </div>
                     </div>                    
                 </div>
+
             </div>
             <p>Графики</p>
             
